@@ -111,7 +111,7 @@
                     $checkUserQuery = "SELECT * FROM student WHERE email= '$email' AND password='$password'";
                     $checkUserExists = mysqli_query($newConnection->connection,$checkUserQuery);
                     if(mysqli_num_rows($checkUserExists) == 0) {
-                        $submitDataQuery = "INSERT INTO `tblUser` (email, password, firstName, lastName, address, phone, degree) 
+                        $submitDataQuery = "INSERT INTO `student` (email, password, firstName, lastName, address, phone, degree) 
                         VALUES ('$email', '$password', '$firstName', '$lastName', '$address', '$phone', '$degree')";
                         $newConnection->executeQuery($newConnection->connection,$submitDataQuery);
                     } 
