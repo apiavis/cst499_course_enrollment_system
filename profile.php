@@ -26,7 +26,6 @@
                 echo "<div class='row'>";
                     echo "<div class='col-md-6 text-left'>";
                         echo "<h3>Email: ".$_SESSION['email']."</h3>";
-                        echo "<h3>Password: ".$_SESSION['password']."</h3>";
                         echo "<h3>First Name: ".$_SESSION['firstName']."</h3>";
                         echo "<h3>Last Name: ".$_SESSION['lastName']."</h3>";
                     echo "</div>";
