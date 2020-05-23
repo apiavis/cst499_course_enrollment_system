@@ -13,10 +13,11 @@
     <script src="https://ajax.googleleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
-<body>
-<div class="jumbotron">
+<body style="font-family:Impact">
+<div class="jumbotron" style="background-color:#f9be46">
     <div class="container text-center">
-        <h1>Course Enrollment System</h1>
+        <h1>Piavis University</h1>
+        <h2>Course Enrollment System</h2>
     </div>
 </div>
 <nav class="navbar navbar-inverse">
