@@ -48,7 +48,7 @@
                     return $data;
                 }
 
-                $loginQuery = "SELECT * FROM tbluser WHERE email= '$email' AND password='$password'"; 
+                $loginQuery = "SELECT * FROM student WHERE email= '$email' AND password='$password'"; 
                 if(isset($_POST['login_user'])) {
                     $results = mysqli_query($newConnection->connection, $loginQuery); 
                     if (mysqli_num_rows($results) == 1) { 
