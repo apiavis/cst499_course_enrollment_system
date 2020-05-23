@@ -78,7 +78,7 @@
                     <label for="inputPhone">Phone</label>
                     <input type="tel" class="form-control" id="inputPhone" placeholder="123-456-7890" name="phone" required>
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-6" id="no-padding-right">
                     <label for="inputDegree">Degree</label>
                     <input type="text" class="form-control" id="inputDegree" placeholder="B.S. in Computer Software Technology" name="degree" required>
                 </div>
