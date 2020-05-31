@@ -53,6 +53,7 @@
                     $results = mysqli_query($newConnection->connection, $loginQuery); 
                     if (mysqli_num_rows($results) == 1) { 
                         while($row = mysqli_fetch_assoc($results)) {
+                            $_SESSION['studentId'] = $row['student_id'];
                             $_SESSION['username'] = $row['firstName'];
                             $_SESSION['email'] = $row['email'];
                             $_SESSION['password'] = $row['password'];
