@@ -56,11 +56,14 @@ function displayCourseSchedule($connection,$studentId) {
                 echo "<div class='col-md-6 text-left'>";
                     echo "<h3>".$_SESSION['courseName']."</h3>";
                 echo "</div>";
-                echo "<div class='col-md-3 text-left'>";
+                echo "<div class='col-md-2 text-left'>";
                     echo "<h3>".$_SESSION['courseSemester']."</h3>";
                 echo "</div>";
-                echo "<div class='col-md-3 text-left'>";
+                echo "<div class='col-md-2 text-left'>";
                     echo "<h3>".$_SESSION['courseYear']."</h3>";
+                echo "</div>";
+                echo "<div style='padding-top:15px' class='col-md-2 text-left'>";
+                    echo "<button style='font-family:sans-serif' type='button' class='btn btn-danger' name=".$_SESSION['offeringId'].">DROP</button>";
                 echo "</div>";
             echo "</div>";
         }
