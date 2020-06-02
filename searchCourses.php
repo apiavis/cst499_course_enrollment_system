@@ -3,6 +3,8 @@
     require_once('Connect.php');
     unset($_SESSION['selectedSemester']);
     unset($_SESSION['selectedYear']);
+    unset($_SESSION['selectedCourse']);
+    unset($_SESSION['selectedOfferingId']);
     require 'master.php';
     $myConnection = $newConnection->connection;
 ?>
@@ -58,16 +60,9 @@
                 if (isset($_POST['search_courses'])) {
                     $_SESSION['selectedSemester'] = test_input($_POST["semester"]);
                     $_SESSION['selectedYear'] = test_input($_POST["year"]);
-                }
-                  
-                function test_input($data) {
-                    $data = trim($data);
-                    $data = stripslashes($data);
-                    $data = htmlspecialchars($data);
-                    return $data;
-                }
-                         
-                // header('location: selectCourse.php');                 
+
+                    header('location: addCourse.php');
+                }                 
             ?>
         </form>
     </div>
@@ -76,58 +71,34 @@
 </html>
 
 <?php
-function getSemestersAvailable($connection) {
-    $items = array();
-
-    $getSemestersQuery =  "SELECT DISTINCT semester FROM offering";
-    $results = mysqli_query($connection, $getSemestersQuery); 
-    while($row = mysqli_fetch_assoc($results)) {
-        $items[] = $row;
+    function test_input($data) {
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
     }
-    print_r($items);
-    return $items;
-}
+    
+    function getSemestersAvailable($connection) {
+        $items = array();
 
-function getYearsAvailable($connection) {
-    $items = array();
-
-    $getSemestersQuery =  "SELECT DISTINCT year FROM offering";
-    $results = mysqli_query($connection, $getSemestersQuery); 
-    while($row = mysqli_fetch_assoc($results)) {
-        $items[] = $row;
+        $getSemestersQuery =  "SELECT DISTINCT semester FROM offering";
+        $results = mysqli_query($connection, $getSemestersQuery); 
+        while($row = mysqli_fetch_assoc($results)) {
+            $items[] = $row;
+        }
+        print_r($items);
+        return $items;
     }
-    print_r($items);
-    return $items;
-}
-// function getCoursesAvailable($connection,$studentId) {
-//     $getScheduleQuery =  "SELECT enrollment.student_id, offering.offering_id, course.courseName, offering.year, offering.semester
-//         FROM ((enrollment
-//             INNER JOIN offering ON enrollment.offering_id = offering.offering_id
-//                 AND enrollment.student_id = $studentId)
-//             INNER JOIN course ON course.course_id = offering.course_id)";
-//     $results = mysqli_query($connection, $getScheduleQuery); 
-//     if (mysqli_num_rows($results) != 0) { 
-//         while($row = mysqli_fetch_assoc($results)) {
-//             $_SESSION['offeringId'] = $row['offering_id'];
-//             $_SESSION['courseName'] = $row['courseName'];
-//             $_SESSION['courseYear'] = $row['year'];
-//             $_SESSION['courseSemester'] = $row['semester'];
 
-//             echo "<div class='row'>";
-//                 echo "<div class='col-md-6 text-left'>";
-//                     echo "<h3>".$_SESSION['courseName']."</h3>";
-//                 echo "</div>";
-//                 echo "<div class='col-md-2 text-left'>";
-//                     echo "<h3>".$_SESSION['courseSemester']."</h3>";
-//                 echo "</div>";
-//                 echo "<div class='col-md-2 text-left'>";
-//                     echo "<h3>".$_SESSION['courseYear']."</h3>";
-//                 echo "</div>";
-//                 echo "<div style='padding-top:15px' class='col-md-2 text-left'>";
-//                     echo "<button style='font-family:sans-serif' type='button' class='btn btn-danger' name=".$_SESSION['offeringId'].">DROP</button>";
-//                 echo "</div>";
-//             echo "</div>";
-//         }
-//     } 
-// };
+    function getYearsAvailable($connection) {
+        $items = array();
+
+        $getSemestersQuery =  "SELECT DISTINCT year FROM offering";
+        $results = mysqli_query($connection, $getSemestersQuery); 
+        while($row = mysqli_fetch_assoc($results)) {
+            $items[] = $row;
+        }
+        print_r($items);
+        return $items;
+    }
 ?>
