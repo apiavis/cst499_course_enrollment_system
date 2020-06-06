@@ -1,9 +1,12 @@
 <?php
+
     error_reporting(E_ALL ^ E_NOTICE);
     require_once('Connect.php');
     unset($_SESSION['username']);
     require 'master.php';
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,6 +39,7 @@
             </div>
             <button type="submit" class="btn btn-primary" name="login_user">Submit</button>
             <?php 
+
                 if (isset($_POST['login_user'])) {
                     $email = test_input($_POST["email"]);
                     $password = test_input($_POST["password"]);
@@ -71,6 +75,8 @@
             ?>
         </form>
     </div>
+
 <?php require_once 'footer.php';?>
+
 </body>
 </html>
