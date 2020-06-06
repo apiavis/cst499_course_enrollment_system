@@ -42,6 +42,8 @@
                 
                 $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);
                 dropCourse($myConnection,$_SESSION['studentId'],$_SESSION['dropOfferingId']);
+                echo "<p style='padding-top:15px'>You have successfully dropped ".$_SESSION['droppedCourseName']." from ".$_SESSION['droppedSemester']." ".$_SESSION['droppedYear']."</p>";
+                echo "<p>Please wait while your schedule is updated.</p>";
                 numStudentsEnrolled($myConnection,$_SESSION['dropOfferingId']);
                 maxStudentsForCourse($myConnection,$_SESSION['dropOfferingId']);
                 if ($_SESSION['numStudentsEnrolled'] == $_SESSION['maxStudents'] - 1) {
@@ -113,6 +115,19 @@
         $dropQuery =  "DELETE FROM enrollment
             WHERE student_id = $studentId AND offering_id = $offeringId";
         $results = mysqli_query($connection, $dropQuery);
+
+        $getCourseInfoQuery =  "SELECT course.courseName, offering.semester, offering.year
+            FROM course
+            INNER JOIN offering ON course.course_id = offering.course_id
+                AND offering.offering_id = $offeringId";
+        $results = mysqli_query($connection, $getCourseInfoQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['droppedCourseName'] = $row['courseName'];
+                $_SESSION['droppedSemester'] = $row['semester'];
+                $_SESSION['droppedYear'] = $row['year'];
+            };
+        };
     };
 
     function numStudentsEnrolled($connection,$offeringId) {
@@ -177,23 +192,15 @@
         $removeFromWaitlistQuery =  "DELETE FROM waitlist 
             WHERE student_id = $studentId
                 AND offering_id = $offeringId
-                AND dateTimeAdded = $dateTimeAdded";
+                AND dateTimeAdded = '$dateTimeAdded'";
         $results = mysqli_query($connection, $removeFromWaitlistQuery);
     };
 
     function notifyStudent($connection,$studentId,$offeringId) {
-        $getCourseInfoQuery =  "SELECT course.courseName, offering.semester, offering.year
-            FROM course
-            INNER JOIN offering ON course.course_id = offering.course_id
-                AND offering.offering_id = $offeringId";
-        $results = mysqli_query($connection, $getCourseInfoQuery);
-        if (mysqli_num_rows($results) == 1) { 
-            while($row = mysqli_fetch_assoc($results)) {
-                $_SESSION['droppedCourseName'] = $row['courseName'];
-                $_SESSION['droppedSemester'] = $row['semester'];
-                $_SESSION['droppedYear'] = $row['year'];
-            };
-        };
+        $createNotificationQuery =  "INSERT INTO notification (student_id, offering_id)
+            VALUES 
+                ($studentId,$offeringId)";
+        $results = mysqli_query($connection, $createNotificationQuery);
     };
 
 ?>
