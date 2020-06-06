@@ -1,8 +1,12 @@
 <?php
+
     error_reporting(E_ALL ^ E_NOTICE);
     require_once('Connect.php');
+    unset($_SESSION['dropOfferingId']);
     $myConnection = $newConnection->connection;
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,53 +24,184 @@
 
     <div class="container text-center">
         <?php 
+
             if(isset($_SESSION['username'])) {
                 echo "<h1>Here is your course schedule, ".$_SESSION['username']."</h1>";
                 echo "<br>";
                 echo "<h2>You are registered for:</h2>";
+
                 displayCourseSchedule($myConnection,$_SESSION['studentId']);
             }
             else {
-                echo "<h1>Welcome to the Profile Page</h1>";
+                echo "<h1>Course Schedule Page</h1>";
                 echo "<h3>Please login or register</h3>";
-            }
+            };
+
+            if (isset($_POST['dropButton'])) {
+                echo "<meta http-equiv='refresh' content='0'>";
+                
+                $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);
+                dropCourse($myConnection,$_SESSION['studentId'],$_SESSION['dropOfferingId']);
+                numStudentsEnrolled($myConnection,$_SESSION['dropOfferingId']);
+                // echo $_SESSION['numStudentsEnrolled'];
+                maxStudentsForCourse($myConnection,$_SESSION['dropOfferingId']);
+                // echo $_SESSION['maxStudents'];
+                if ($_SESSION['numStudentsEnrolled'] == $_SESSION['maxStudents'] - 1) {
+                    numStudentsOnWaitlist($myConnection,$_SESSION['dropOfferingId']);
+                    // echo $_SESSION['numStudentsOnWaitlist'];
+                        if ($_SESSION['numStudentsOnWaitlist'] != 0) {
+                            getWaitlistedStudent($myConnection,$_SESSION['dropOfferingId']);
+                            // echo $_SESSION['waitlistedStudentId'];
+                            // echo $_SESSION['dateTimeAdded'];
+                            registerForCourse($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
+                            removeStudentFromWaitlist($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId'],$_SESSION['dateTimeAdded']);
+                            notifyStudent($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
+                            echo $_SESSION['droppedCourseName'];
+                            echo $_SESSION['droppedSemester'];
+                            echo $_SESSION['droppedYear'];
+                        }
+                }
+
+            };
+
         ?>
+
     </div>
 
 <?php include 'footer.php';?>
+
 </body>
 </html>
 
 <?php
-function displayCourseSchedule($connection,$studentId) {
-    $getScheduleQuery =  "SELECT enrollment.student_id, offering.offering_id, course.courseName, offering.year, offering.semester
-        FROM ((enrollment
-            INNER JOIN offering ON enrollment.offering_id = offering.offering_id
-                AND enrollment.student_id = $studentId)
-            INNER JOIN course ON course.course_id = offering.course_id)";
-    $results = mysqli_query($connection, $getScheduleQuery); 
-    if (mysqli_num_rows($results) != 0) { 
-        while($row = mysqli_fetch_assoc($results)) {
-            $_SESSION['offeringId'] = $row['offering_id'];
-            $_SESSION['courseName'] = $row['courseName'];
-            $_SESSION['courseYear'] = $row['year'];
-            $_SESSION['courseSemester'] = $row['semester'];
 
-            echo "<div class='row'>";
-                echo "<div class='col-md-6 text-left'>";
-                    echo "<h3>".$_SESSION['courseName']."</h3>";
+    function test_input($data) {
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
+    }
+
+    function displayCourseSchedule($connection,$studentId) {
+        $getScheduleQuery =  "SELECT enrollment.student_id, offering.offering_id, course.courseName, offering.year, offering.semester
+            FROM ((enrollment
+                INNER JOIN offering ON enrollment.offering_id = offering.offering_id
+                    AND enrollment.student_id = $studentId)
+                INNER JOIN course ON course.course_id = offering.course_id)";
+        $results = mysqli_query($connection, $getScheduleQuery); 
+        if (mysqli_num_rows($results) != 0) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['offeringId'] = $row['offering_id'];
+                $_SESSION['courseName'] = $row['courseName'];
+                $_SESSION['courseYear'] = $row['year'];
+                $_SESSION['courseSemester'] = $row['semester'];
+
+                echo "<div class='row'>";
+                    echo "<div class='col-md-6 text-left'>";
+                        echo "<h3>".$_SESSION['courseName']."</h3>";
+                    echo "</div>";
+                    echo "<div class='col-md-2 text-left'>";
+                        echo "<h3>".$_SESSION['courseSemester']."</h3>";
+                    echo "</div>";
+                    echo "<div class='col-md-2 text-left'>";
+                        echo "<h3>".$_SESSION['courseYear']."</h3>";
+                    echo "</div>";
+                    echo "<div style='padding-top:15px' class='col-md-2 text-left'>";
+                        echo "<form method='post'>";
+                            echo "<input type='hidden' name='drop' value=".$_SESSION['offeringId'].">";
+                            echo "<button style='font-family:sans-serif' type='submit' class='btn btn-danger' name='dropButton'>DROP</button>";
+                        echo "</form>";
+                    echo "</div>";
                 echo "</div>";
-                echo "<div class='col-md-2 text-left'>";
-                    echo "<h3>".$_SESSION['courseSemester']."</h3>";
-                echo "</div>";
-                echo "<div class='col-md-2 text-left'>";
-                    echo "<h3>".$_SESSION['courseYear']."</h3>";
-                echo "</div>";
-                echo "<div style='padding-top:15px' class='col-md-2 text-left'>";
-                    echo "<button style='font-family:sans-serif' type='button' class='btn btn-danger' name=".$_SESSION['offeringId'].">DROP</button>";
-                echo "</div>";
-            echo "</div>";
-        }
-    } 
-};
+            }
+        } 
+    };
+
+    function dropCourse($connection,$studentId,$offeringId) {
+        $dropQuery =  "DELETE FROM enrollment
+            WHERE student_id = $studentId AND offering_id = $offeringId";
+        $results = mysqli_query($connection, $dropQuery);
+    };
+
+    function numStudentsEnrolled($connection,$offeringId) {
+        $numStuEnrolledQuery =  "SELECT COUNT(enrollment.offering_id) as 'count'
+            FROM enrollment
+            WHERE offering_id = $offeringId";
+        $results = mysqli_query($connection, $numStuEnrolledQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['numStudentsEnrolled'] = $row['count'];
+            };
+        };
+    };
+
+    function maxStudentsForCourse($connection,$offeringId) {
+        $maxStudentsQuery =  "SELECT course.maxStudents
+            FROM course
+            INNER JOIN offering ON offering.course_id = course.course_id
+                AND offering.offering_id = $offeringId";
+        $results = mysqli_query($connection, $maxStudentsQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['maxStudents'] = $row['maxStudents'];
+            };
+        };
+    };
+
+    function numStudentsOnWaitlist($connection,$offeringId) {
+        $numStuWaitlistQuery =  "SELECT COUNT(*) as students
+            FROM waitlist
+            WHERE offering_id = $offeringId";
+        $results = mysqli_query($connection, $numStuWaitlistQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['numStudentsOnWaitlist'] = $row['students'];
+            };
+        };
+    };
+
+    function getWaitlistedStudent($connection,$offeringId) {
+        $waitlistedStudentQuery =  "SELECT student_id, dateTimeAdded
+            FROM waitlist
+            WHERE offering_id = $offeringId
+            ORDER BY dateTimeAdded LIMIT 1";
+        $results = mysqli_query($connection, $waitlistedStudentQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['waitlistedStudentId'] = $row['student_id'];
+                $_SESSION['dateTimeAdded'] = $row['dateTimeAdded'];
+            };
+        };
+    };
+
+    function registerForCourse($connection,$studentId,$offeringId) {
+        $registerQuery =  "INSERT INTO enrollment (student_id, offering_id)
+            VALUES 
+                ($studentId,$offeringId)";
+        $results = mysqli_query($connection, $registerQuery);
+    }
+    
+    function removeStudentFromWaitlist($connection,$studentId,$offeringId,$dateTimeAdded) {
+        $removeFromWaitlistQuery =  "DELETE FROM waitlist 
+            WHERE student_id = $studentId
+                AND offering_id = $offeringId
+                AND dateTimeAdded = $dateTimeAdded";
+        $results = mysqli_query($connection, $removeFromWaitlistQuery);
+    };
+
+    function notifyStudent($connection,$studentId,$offeringId) {
+        $getCourseInfoQuery =  "SELECT course.courseName, offering.semester, offering.year
+            FROM course
+            INNER JOIN offering ON course.course_id = offering.course_id
+                AND offering.offering_id = $offeringId";
+        $results = mysqli_query($connection, $getCourseInfoQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['droppedCourseName'] = $row['courseName'];
+                $_SESSION['droppedSemester'] = $row['semester'];
+                $_SESSION['droppedYear'] = $row['year'];
+            };
+        };
+    };
+
 ?>
