@@ -43,22 +43,14 @@
                 $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);
                 dropCourse($myConnection,$_SESSION['studentId'],$_SESSION['dropOfferingId']);
                 numStudentsEnrolled($myConnection,$_SESSION['dropOfferingId']);
-                // echo $_SESSION['numStudentsEnrolled'];
                 maxStudentsForCourse($myConnection,$_SESSION['dropOfferingId']);
-                // echo $_SESSION['maxStudents'];
                 if ($_SESSION['numStudentsEnrolled'] == $_SESSION['maxStudents'] - 1) {
                     numStudentsOnWaitlist($myConnection,$_SESSION['dropOfferingId']);
-                    // echo $_SESSION['numStudentsOnWaitlist'];
                         if ($_SESSION['numStudentsOnWaitlist'] != 0) {
                             getWaitlistedStudent($myConnection,$_SESSION['dropOfferingId']);
-                            // echo $_SESSION['waitlistedStudentId'];
-                            // echo $_SESSION['dateTimeAdded'];
                             registerForCourse($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
                             removeStudentFromWaitlist($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId'],$_SESSION['dateTimeAdded']);
                             notifyStudent($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
-                            echo $_SESSION['droppedCourseName'];
-                            echo $_SESSION['droppedSemester'];
-                            echo $_SESSION['droppedYear'];
                         }
                 }
 
