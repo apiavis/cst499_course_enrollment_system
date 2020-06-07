@@ -40,9 +40,9 @@
 
             if( isset($_SESSION['username']))
             {
-                echo '<li><a href="profile.php"><span class="glyphicon glyphicon-briefcase"></span> Profile</a></li>';
-                echo '<li><a href="viewSchedule.php"><span class="glyphicon glyphicon-briefcase"></span> View Schedule</a></li>';
-                echo '<li><a href="searchCourses.php"><span class="glyphicon glyphicon-briefcase"></span> Register for Courses</a></li>';
+                echo '<li><a href="profile.php"><span class="glyphicon glyphicon-user"></span> Profile</a></li>';
+                echo '<li><a href="viewSchedule.php"><span class="glyphicon glyphicon-th-list"></span> View Schedule</a></li>';
+                echo '<li><a href="searchCourses.php"><span class="glyphicon glyphicon-plus"></span> Register for Courses</a></li>';
                 echo '<li><a href="logout.php"><span class="glyphicon glyphicon-off"></span> Logout</a></li>';
             }
             else
