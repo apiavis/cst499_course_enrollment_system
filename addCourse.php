@@ -25,10 +25,10 @@
         <?php
 
             if($_SESSION['selectedYear'] == 2020 && $_SESSION['selectedSemester'] == 'Spring') {
-                echo "<h1>Sorry, registration for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear']." is closed.<h1>";
+                echo "<h1>Sorry, registration for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear']." is closed.</h1>";
             } else {
                 echo "<h1>Register for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear']."</h1>";
-                echo "<h3>Please select the course that you would like to register for<h3>";
+                echo "<h3>Please select the course that you would like to register for</h3>";
             }
             
         ?>

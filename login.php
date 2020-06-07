@@ -69,6 +69,8 @@
                         }
                          
                         header('location: home.php'); 
+                    } else {
+                        echo "<p>Please enter a valid username and password.</p>";
                     } 
                 }
                 
