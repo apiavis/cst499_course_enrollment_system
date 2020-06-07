@@ -17,7 +17,7 @@
 
 <?php include 'master.php';?>
 
-    <div class="container text-center">
+    <div style='margin-bottom:60px' class="container text-center">
         <?php 
             if(isset($_SESSION['username'])) {
                 echo "<h1>Welcome to Your Profile, ".$_SESSION['username']."</h1>";

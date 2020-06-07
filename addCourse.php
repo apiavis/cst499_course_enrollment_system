@@ -27,7 +27,7 @@
             echo "<h3>Please select the course that you would like to register for<h3>";
         ?>
     </div>
-    <div class="container">
+    <div style='margin-bottom:60px' class="container">
         <form class="padding-top" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
             <div class="form-row">
                 <div class="form-group col-md-12" id="no-padding-left">
