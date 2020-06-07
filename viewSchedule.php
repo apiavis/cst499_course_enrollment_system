@@ -3,6 +3,14 @@
     error_reporting(E_ALL ^ E_NOTICE);
     require_once('Connect.php');
     unset($_SESSION['dropOfferingId']);
+    unset($_SESSION['droppedCourseName']);
+    unset($_SESSION['droppedSemester']);
+    unset($_SESSION['droppedYear']);
+    unset($_SESSION['numStudentsEnrolled']);
+    unset($_SESSION['maxStudents']);
+    unset($_SESSION['numStudentsOnWaitlist']);
+    unset($_SESSION['waitlistedStudentId']);
+    unset($_SESSION['dateTimeAdded']);
     $myConnection = $newConnection->connection;
 
 ?>
@@ -37,10 +45,9 @@
                 echo "<h3>Please login or register</h3>";
             };
 
-            if (isset($_POST['dropButton'])) {
+            if (isset($_POST['dropButton'])) {  
                 echo "<meta http-equiv='refresh' content='0'>";
-                
-                $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);
+                $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);                
                 dropCourse($myConnection,$_SESSION['studentId'],$_SESSION['dropOfferingId']);
                 echo "<p style='padding-top:15px'>You have successfully dropped ".$_SESSION['droppedCourseName']." from ".$_SESSION['droppedSemester']." ".$_SESSION['droppedYear']."</p>";
                 echo "<p>Please wait while your schedule is updated.</p>";
@@ -48,14 +55,13 @@
                 maxStudentsForCourse($myConnection,$_SESSION['dropOfferingId']);
                 if ($_SESSION['numStudentsEnrolled'] == $_SESSION['maxStudents'] - 1) {
                     numStudentsOnWaitlist($myConnection,$_SESSION['dropOfferingId']);
-                        if ($_SESSION['numStudentsOnWaitlist'] != 0) {
-                            getWaitlistedStudent($myConnection,$_SESSION['dropOfferingId']);
-                            registerForCourse($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
-                            removeStudentFromWaitlist($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId'],$_SESSION['dateTimeAdded']);
-                            notifyStudent($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
-                        }
+                    if ($_SESSION['numStudentsOnWaitlist'] != 0) {
+                        getWaitlistedStudent($myConnection,$_SESSION['dropOfferingId']);
+                        registerForCourse($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
+                        removeStudentFromWaitlist($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId'],$_SESSION['dateTimeAdded']);
+                        notifyStudent($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
+                    }
                 }
-
             };
 
         ?>
@@ -85,24 +91,24 @@
         $results = mysqli_query($connection, $getScheduleQuery); 
         if (mysqli_num_rows($results) != 0) { 
             while($row = mysqli_fetch_assoc($results)) {
-                $_SESSION['offeringId'] = $row['offering_id'];
-                $_SESSION['courseName'] = $row['courseName'];
-                $_SESSION['courseYear'] = $row['year'];
-                $_SESSION['courseSemester'] = $row['semester'];
+                $offeringId = $row['offering_id'];
+                $courseName = $row['courseName'];
+                $courseYear = $row['year'];
+                $courseSemester = $row['semester'];
 
                 echo "<div class='row'>";
                     echo "<div class='col-md-6 text-left'>";
-                        echo "<h3>".$_SESSION['courseName']."</h3>";
+                        echo "<h3>".$courseName."</h3>";
                     echo "</div>";
                     echo "<div class='col-md-2 text-left'>";
-                        echo "<h3>".$_SESSION['courseSemester']."</h3>";
+                        echo "<h3>".$courseSemester."</h3>";
                     echo "</div>";
                     echo "<div class='col-md-2 text-left'>";
-                        echo "<h3>".$_SESSION['courseYear']."</h3>";
+                        echo "<h3>".$courseYear."</h3>";
                     echo "</div>";
                     echo "<div style='padding-top:15px' class='col-md-2 text-left'>";
                         echo "<form method='post'>";
-                            echo "<input type='hidden' name='drop' value=".$_SESSION['offeringId'].">";
+                            echo "<input type='hidden' name='drop' value=".$offeringId.">";
                             echo "<button style='font-family:sans-serif' type='submit' class='btn btn-danger' name='dropButton'>DROP</button>";
                         echo "</form>";
                     echo "</div>";
