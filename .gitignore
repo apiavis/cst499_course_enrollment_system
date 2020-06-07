@@ -1,4 +1,2 @@
 config.php
-createDB.sql
-populateData.sql
 queries.sql
