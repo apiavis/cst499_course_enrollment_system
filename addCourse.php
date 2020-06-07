@@ -3,6 +3,7 @@
     require_once('Connect.php');
     unset($_SESSION['selectedOfferingId']);
     unset($_SESSION['registered']);
+    unset($_SESSION['waitlisted']);
     unset($_SESSION['numStudentsEnrolled']);
     unset($_SESSION['maxStudents']);
     require 'master.php';
@@ -66,9 +67,14 @@
                         if ($_SESSION['numStudentsEnrolled'] < $_SESSION['maxStudents']) {
                             registerForCourse($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
                             echo "<p style='padding-top:15px'>You have successfully registered for ".$_SESSION['selectedCourse']." for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear'].".</p>";
-                        } else {
-                            addToWaitlist($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
-                            echo "<p style='padding-top:15px'>This course is full.  You have been successfully added to the waitlist for ".$_SESSION['selectedCourse']." for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear'].".</p>";
+                        } else if ($_SESSION['numStudentsEnrolled'] == $_SESSION['maxStudents']) {
+                            checkIfWaitlisted($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
+                            if ($_SESSION['waitlisted'] == 1) {
+                                echo "<p style='padding-top:15px'>You are already on the waitlist for ".$_SESSION['selectedCourse']." for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear'].".  Please make another selection.</p>";
+                            } else {
+                                addToWaitlist($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
+                                echo "<p style='padding-top:15px'>This course is full.  You have been successfully added to the waitlist for ".$_SESSION['selectedCourse']." for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear'].".</p>";
+                            }                         
                         }
                     }
                 }                
@@ -151,6 +157,18 @@
         if (mysqli_num_rows($results) == 1) { 
             while($row = mysqli_fetch_assoc($results)) {
                 $_SESSION['maxStudents'] = $row['maxStudents'];
+            };
+        };
+    };
+
+    function checkIfWaitlisted($connection,$studentId,$offeringId) {
+        $checkIfWaitlistedQuery =  "SELECT COUNT(*) as count
+        FROM waitlist
+        WHERE student_id = $studentId AND offering_id = $offeringId";
+        $results = mysqli_query($connection, $checkIfWaitlistedQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['waitlisted'] = $row['count'];
             };
         };
     };
