@@ -23,8 +23,14 @@
 
     <div class="container text-center">
         <?php
-            echo "<h1>Register for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear']."</h1>";
-            echo "<h3>Please select the course that you would like to register for<h3>";
+
+            if($_SESSION['selectedYear'] == 2020 && $_SESSION['selectedSemester'] == 'Spring') {
+                echo "<h1>Sorry, registration for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear']." is closed.<h1>";
+            } else {
+                echo "<h1>Register for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear']."</h1>";
+                echo "<h3>Please select the course that you would like to register for<h3>";
+            }
+            
         ?>
     </div>
     <div style='margin-bottom:60px' class="container">
@@ -35,11 +41,13 @@
                     <select id="inputCourse" class="form-control" name="course" required>
                         <option>Choose...</option>
                         <?php
+
                             $availableCoursesArray = array();
                             $availableCoursesArray = getAvailableCourses($myConnection,$_SESSION['selectedYear'],$_SESSION['selectedSemester']);
                             foreach($availableCoursesArray as $data) {
                                 echo "<option>".$data['courseName']."</option>";
                             }
+
                         ?>
                     </select>
                 </div>
