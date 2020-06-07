@@ -13,7 +13,7 @@ error_reporting(E_ALL ^ E_NOTICE)
 <body>
 <div class="navbar-fixed-bottom row-fluid">
     <div class="navbar-inner">
-        <div class="container text-center">
+        <div style='font-family:sans-serif' class="container text-center">
             Copyright @ 2020 Alicia Piavis
         </div>
     </div>

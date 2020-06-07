@@ -17,7 +17,7 @@
 
 <?php require 'master.php';?>
 
-    <div class="container text-center">
+    <div style='margin-bottom:60px' class="container text-center">
         <?php 
             if(isset($_SESSION['username'])) {
                 checkNotifications($myConnection,$_SESSION['studentId']);

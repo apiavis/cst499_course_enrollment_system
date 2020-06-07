@@ -23,7 +23,7 @@
     <div class="container text-center">
         <h1>Welcome to the Login Page</h1>
     </div>
-    <div class="container">
+    <div style='margin-bottom:60px' class="container">
         <form class="padding-top" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
             <div class="form-row">
                 <div class="form-group col-md-12" id="no-padding-left">
