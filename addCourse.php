@@ -1,6 +1,10 @@
 <?php
     error_reporting(E_ALL ^ E_NOTICE);
     require_once('Connect.php');
+    unset($_SESSION['selectedOfferingId']);
+    unset($_SESSION['registered']);
+    unset($_SESSION['numStudentsEnrolled']);
+    unset($_SESSION['maxStudents']);
     require 'master.php';
     $myConnection = $newConnection->connection;
 ?>
@@ -44,10 +48,21 @@
             <?php 
                 if (isset($_POST['select_course'])) {
                     $_SESSION['selectedCourse'] = test_input($_POST["course"]);
-
                     getOfferingId($myConnection,$_SESSION['selectedCourse'],$_SESSION['selectedYear'],$_SESSION['selectedSemester']);
-                    registerForCourse($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
-                    // header('location: viewSchedule.php');
+                    checkIfRegistered($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
+                    if ($_SESSION['registered'] == 1) {
+                        echo "<p style='padding-top:15px'>You are already registered for this course.  Please make another selection.</p>";
+                    } else if ($_SESSION['registered'] == 0) {
+                        numStudentsEnrolled($myConnection,$_SESSION['selectedOfferingId']);
+                        maxStudentsForCourse($myConnection,$_SESSION['selectedOfferingId']);
+                        if ($_SESSION['numStudentsEnrolled'] < $_SESSION['maxStudents']) {
+                            registerForCourse($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
+                            echo "<p style='padding-top:15px'>You have successfully registered for ".$_SESSION['selectedCourse']." for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear'].".</p>";
+                        } else {
+                            addToWaitlist($myConnection,$_SESSION['studentId'],$_SESSION['selectedOfferingId']);
+                            echo "<p style='padding-top:15px'>This course is full.  You have been successfully added to the waitlist for ".$_SESSION['selectedCourse']." for ".$_SESSION['selectedSemester']." ".$_SESSION['selectedYear'].".</p>";
+                        }
+                    }
                 }                
             ?>
         </form>
@@ -95,6 +110,50 @@
         }
     }
 
+    function checkIfRegistered($connection,$studentId,$offeringId) {
+        $checkIfRegisteredQuery =  "SELECT COUNT(*) as count
+        FROM enrollment
+        WHERE student_id = $studentId AND offering_id = $offeringId";
+        $results = mysqli_query($connection, $checkIfRegisteredQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['registered'] = $row['count'];
+            };
+        };
+    };
+
+    function numStudentsEnrolled($connection,$offeringId) {
+        $numStuEnrolledQuery =  "SELECT COUNT(enrollment.offering_id) as 'count'
+            FROM enrollment
+            WHERE offering_id = $offeringId";
+        $results = mysqli_query($connection, $numStuEnrolledQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['numStudentsEnrolled'] = $row['count'];
+            };
+        };
+    };
+
+    function maxStudentsForCourse($connection,$offeringId) {
+        $maxStudentsQuery =  "SELECT course.maxStudents
+            FROM course
+            INNER JOIN offering ON offering.course_id = course.course_id
+                AND offering.offering_id = $offeringId";
+        $results = mysqli_query($connection, $maxStudentsQuery);
+        if (mysqli_num_rows($results) == 1) { 
+            while($row = mysqli_fetch_assoc($results)) {
+                $_SESSION['maxStudents'] = $row['maxStudents'];
+            };
+        };
+    };
+
+    function addToWaitlist($connection,$studentId,$offeringId) {
+        $addToWaitlistQuery =  "INSERT INTO waitlist (student_id, offering_id, dateTimeAdded)
+            VALUES 
+                ($studentId,$offeringId,NOW())";
+        $results = mysqli_query($connection, $addToWaitlistQuery);
+    }
+    
     function registerForCourse($connection,$studentId,$offeringId) {
         $registerQuery =  "INSERT INTO enrollment (student_id, offering_id)
             VALUES 
