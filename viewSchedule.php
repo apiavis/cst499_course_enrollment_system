@@ -45,10 +45,9 @@
                 echo "<h3>Please login or register</h3>";
             };
 
-            if (isset($_POST['dropButton'])) {
+            if (isset($_POST['dropButton'])) {  
                 echo "<meta http-equiv='refresh' content='0'>";
-                
-                $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);
+                $_SESSION['dropOfferingId'] = test_input($_POST["drop"]);                
                 dropCourse($myConnection,$_SESSION['studentId'],$_SESSION['dropOfferingId']);
                 echo "<p style='padding-top:15px'>You have successfully dropped ".$_SESSION['droppedCourseName']." from ".$_SESSION['droppedSemester']." ".$_SESSION['droppedYear']."</p>";
                 echo "<p>Please wait while your schedule is updated.</p>";
@@ -56,14 +55,13 @@
                 maxStudentsForCourse($myConnection,$_SESSION['dropOfferingId']);
                 if ($_SESSION['numStudentsEnrolled'] == $_SESSION['maxStudents'] - 1) {
                     numStudentsOnWaitlist($myConnection,$_SESSION['dropOfferingId']);
-                        if ($_SESSION['numStudentsOnWaitlist'] != 0) {
-                            getWaitlistedStudent($myConnection,$_SESSION['dropOfferingId']);
-                            registerForCourse($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
-                            removeStudentFromWaitlist($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId'],$_SESSION['dateTimeAdded']);
-                            notifyStudent($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
-                        }
+                    if ($_SESSION['numStudentsOnWaitlist'] != 0) {
+                        getWaitlistedStudent($myConnection,$_SESSION['dropOfferingId']);
+                        registerForCourse($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
+                        removeStudentFromWaitlist($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId'],$_SESSION['dateTimeAdded']);
+                        notifyStudent($myConnection,$_SESSION['waitlistedStudentId'],$_SESSION['dropOfferingId']);
+                    }
                 }
-
             };
 
         ?>
